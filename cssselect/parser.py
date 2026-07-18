@@ -739,10 +739,13 @@ def parse_simple_selector_arguments(stream: TokenStream) -> list[Tree]:
             )
         stream.skip_whitespace()
         next_ = stream.next()
-        if next_ in (("EOF", None), ("DELIM", ",")):
-            stream.next()
+        if next_ == ("DELIM", ","):
+            # Comma already consumed; do not call next() again (that ate the
+            # following selector when no whitespace followed the comma).
             stream.skip_whitespace()
             arguments.append(result)
+        elif next_ == ("EOF", None):
+            raise SelectorSyntaxError(f"Expected an argument, got {next_}")
         elif next_ == ("DELIM", ")"):
             arguments.append(result)
             break
