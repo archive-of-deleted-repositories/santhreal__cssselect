@@ -840,7 +840,11 @@ class HTMLTranslator(GenericTranslator):
                 f"Expected a single string or ident for :lang(), got {function.arguments!r}"
             )
         value = function.arguments[0].value
-        assert value
+        # Empty lang makes starts-with(..., '-') match every @lang element.
+        if not value:
+            raise ExpressionError(
+                f"Expected a non-empty string or ident for :lang(), got {function.arguments!r}"
+            )
         arg = self.xpath_literal(value.lower() + "-")
         return xpath.add_condition(
             "ancestor-or-self::*[@lang][1][starts-with(concat("

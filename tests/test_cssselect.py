@@ -586,6 +586,14 @@ class TestCssselect(unittest.TestCase):
             xpath(":lorem(ipsum)")
         with pytest.raises(ExpressionError):
             xpath("::lorem-ipsum")
+        with pytest.raises(ExpressionError):
+            HTMLTranslator().css_to_xpath(':lang("")')
+        with pytest.raises(ExpressionError):
+            HTMLTranslator().css_to_xpath(":lang('')")
+        assert GenericTranslator().css_to_xpath(':lang("")') == (
+            "descendant-or-self::*[lang('')]"
+        )
+        assert "en-" in HTMLTranslator().css_to_xpath(':lang("EN")')
         with pytest.raises(TypeError):
             GenericTranslator().css_to_xpath(4)  # type: ignore[arg-type]
         with pytest.raises(TypeError):
