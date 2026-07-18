@@ -425,6 +425,10 @@ class TestCssselect(unittest.TestCase):
         assert get_error(":where(a b)") == (
             "Expected an argument, got <IDENT 'b' at 9>"
         )
+        assert get_error(":is(div") == ("Expected an argument, got <EOF at 7>")
+        assert get_error(":where(div") == ("Expected an argument, got <EOF at 10>")
+        assert get_error(":is(div,span)") is None
+        assert get_error(":where(a,b)") is None
         assert get_error(":scope > div :scope header") == (
             'Got immediate child pseudo-element ":scope" not at the start of a selector'
         )
