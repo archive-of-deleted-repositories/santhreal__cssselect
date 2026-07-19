@@ -732,11 +732,8 @@ class GenericTranslator:
         self, xpath: XPathExpr, name: str, value: str | None
     ) -> XPathExpr:
         assert value is not None
-        # FIXME: this seems like a weird hack...
-        if value:
-            xpath.add_condition(f"not({name}) or {name} != {self.xpath_literal(value)}")
-        else:
-            xpath.add_condition(f"{name} != {self.xpath_literal(value)}")
+        # [foo!=bar] is documented as equivalent to :not([foo=bar])
+        xpath.add_condition(f"not({name} = {self.xpath_literal(value)})")
         return xpath
 
     def xpath_attrib_includes(

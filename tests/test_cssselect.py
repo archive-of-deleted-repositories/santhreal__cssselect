@@ -459,6 +459,10 @@ class TestCssselect(unittest.TestCase):
         assert xpath('e[hreflang|="en"]') == (
             "e[@hreflang and (@hreflang = 'en' or starts-with(@hreflang, 'en-'))]"
         )
+        # [foo!=bar] is the same as :not([foo=bar]), including when bar is empty
+        assert xpath('e[foo!="bar"]') == ("e[not(@foo = 'bar')]")
+        assert xpath('e[foo!=""]') == ("e[not(@foo = '')]")
+        assert xpath('e[foo!=""]') == xpath('e:not([foo=""])')
 
         # --- nth-* and nth-last-* -------------------------------------
         assert xpath("e:nth-child(1)") == ("e[count(preceding-sibling::*) = 0]")
@@ -1029,6 +1033,11 @@ class TestCssselect(unittest.TestCase):
         assert pcss("a[href]") == ["tag-anchor", "nofollow-anchor"]
         assert pcss(":not(*)") == []
         assert pcss("a:not([href])") == ["name-anchor"]
+        # [attr!=""] must match missing attributes, same as :not([attr=""])
+        assert pcss('a[href!=""]') == ["name-anchor", "tag-anchor", "nofollow-anchor"]
+        assert pcss('a[href!=""]') == pcss('a:not([href=""])')
+        assert pcss('link[href!=""]') == ["link-href", "link-nohref"]
+        assert pcss('link[href!=""]') == pcss('link:not([href=""])')
         assert pcss("ol :Not(li[class])") == [
             "first-li",
             "second-li",
